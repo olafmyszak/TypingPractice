@@ -1,0 +1,29 @@
+<div class="start-menu" *ngIf="!this.gameStarted; else start">
+  <button mat-raised-button class="start-button" (click)="gameStarted = true">START</button>
+</div>
+
+<ng-template #start>
+  <div class="game-loop">
+    <!-- Display the random word in a large font -->
+    <h1>{{ randomWord }}</h1>
+
+    <!-- Input field for the user to type the word -->
+    <input
+      type="text"
+      [(ngModel)]="userInput"
+      class="word-input"
+      (input)="onInput()"
+      [cdkTrapFocus]="true"
+      [cdkTrapFocusAutoCapture]="true"
+    />
+
+    <!-- Display remaining time in seconds -->
+    <div class="timer">
+      Time left: {{ timeLeft / 1000 }} seconds
+    </div>
+
+    <!-- Stop button to end the game -->
+    <button mat-raised-button class="stop-button" (click)="gameStarted = false">STOP</button>
+  </div>
+</ng-template>
+
