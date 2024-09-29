@@ -1,42 +1,38 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, map, Observable} from "rxjs";
+import {catchError, map, Observable, of} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class WordGeneratorService {
   private wordlist: string[] = [];
-  private wordlistLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  constructor(private http: HttpClient) {
-  }
+  http = inject(HttpClient);
 
   getWordList(): Observable<string[]> {
     return this.http.get(wordlist, {responseType: 'text'}).pipe(
       map((data: string) => {
-        this.wordlist = data.split(/\r?\n/).filter(word => word.trim().length > 0);
-        this.wordlistLoaded.next(true);
-        return this.wordlist;
+        return data.split(/\r?\n/).filter(word => word.trim().length > 0); // Split words by newline
+      }),
+      catchError((err) => {
+        console.log("Error: ", err);
+        return of();
       })
     );
   }
 
   getRandomWord(): Observable<string> {
-    if (this.wordlist.length == 0) {
-      console.log('loading')
-      this.getWordList().subscribe();
+    if (this.wordlist.length === 0) {
+      return this.getWordList().pipe(
+        map(wordlist => {
+          this.wordlist = wordlist;
+          return this.wordlist[Math.floor(Math.random() * this.wordlist.length)];
+        })
+      );
+    } else {
+      return of(this.wordlist[Math.floor(Math.random() * this.wordlist.length)]);
     }
-
-    return new Observable<string>(observer => {
-      this.wordlistLoaded.subscribe(loaded => {
-        if (loaded) {
-          const randomIndex = Math.floor(Math.random() * this.wordlist.length);
-          observer.next(this.wordlist[randomIndex]);
-          observer.complete();
-        }
-      });
-    });
   }
 }
 

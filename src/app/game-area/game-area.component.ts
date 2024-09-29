@@ -39,7 +39,7 @@ export class GameAreaComponent implements OnInit {
     "Way to go! 🎉",
   ]
 
-  randomCongrats = this.congratulations[0];
+  randomCongrats: string = this.congratulations[0];
 
   timeIntervalSeconds: number = 10;
   timeLeft = signal(this.timeIntervalSeconds * 1000);
@@ -51,7 +51,7 @@ export class GameAreaComponent implements OnInit {
   wordGeneratorService = inject(WordGeneratorService);
   cdr = inject(ChangeDetectorRef);
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.generateRandomWord(); // Populate the wordlist
   }
 
@@ -66,7 +66,7 @@ export class GameAreaComponent implements OnInit {
     clearInterval(this.interval);
   }
 
-  generateRandomWord() {
+  generateRandomWord(): void {
     this.wordGeneratorService.getRandomWord().subscribe((word) => {
       this.randomWord = word.toLowerCase();
       this.clearUserInput(0);
@@ -74,13 +74,14 @@ export class GameAreaComponent implements OnInit {
     })
   }
 
-  onInput() {
+  onInput(): void {
     const inputLowered = this.userInput.toLowerCase();
 
     if (!this.randomWord.startsWith(inputLowered)) {
       this.flashInput = true;
       this.showTryAgain = true;
       this.correct = false;
+
       this.clearUserInput(200);
 
       setTimeout(() => {
@@ -89,22 +90,25 @@ export class GameAreaComponent implements OnInit {
       }, 900);
 
       ++this.totalAttempts;
-    } else if (inputLowered === this.randomWord) {
+    } else if (inputLowered === this.randomWord) { //If user input is correct
       this.correct = true;
+      this.showTryAgain = false;
+      this.flashInput = false;
+
       ++this.successfulAttempts;
       ++this.totalAttempts;
+
       this.generateRandomWord();
-      this.clearUserInput(0);
 
       if (this.timeIntervalSeconds > 1.0) {
         this.timeIntervalSeconds -= 0.5; // Decrease time interval for typing in the word by 0.5 second if correctly typed
       }
+
       this.startTimer();
 
-      this.randomCongrats = this.congratulations[Math.floor(Math.random() * this.congratulations.length)]
+      this.randomCongrats = this.congratulations[Math.floor(Math.random() * this.congratulations.length)];
 
-      this.showTryAgain = false;
-      this.flashInput = false;
+      this.playSound(correctSoundPath);
 
       setTimeout(() => {
         this.correct = false;
@@ -112,7 +116,7 @@ export class GameAreaComponent implements OnInit {
     }
   }
 
-  startTimer() {
+  startTimer(): void {
     this.timeLeft.set(this.timeIntervalSeconds * 1000);
 
     clearInterval(this.interval);
@@ -131,11 +135,17 @@ export class GameAreaComponent implements OnInit {
     }, 100);
   }
 
-  clearUserInput(timeout: number) {
+  clearUserInput(timeout: number): void {
     setTimeout(() => {
       this.userInput = '';
     }, timeout);
   }
 
-  protected readonly Math = Math;
+  playSound(path: string): void {
+    const audio = new Audio(path);
+    audio.load();
+    void audio.play();
+  }
 }
+
+export const correctSoundPath: string = '/assets/correct.wav';
