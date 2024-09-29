@@ -13,7 +13,7 @@ export class WordGeneratorService {
   }
 
   getWordList(): Observable<string[]> {
-    return this.http.get('/assets/wordlist.txt', {responseType: 'text'}).pipe(
+    return this.http.get(wordlist, {responseType: 'text'}).pipe(
       map((data: string) => {
         this.wordlist = data.split(/\r?\n/).filter(word => word.trim().length > 0);
         this.wordlistLoaded.next(true);
@@ -24,6 +24,7 @@ export class WordGeneratorService {
 
   getRandomWord(): Observable<string> {
     if (this.wordlist.length == 0) {
+      console.log('loading')
       this.getWordList().subscribe();
     }
 
@@ -38,3 +39,5 @@ export class WordGeneratorService {
     });
   }
 }
+
+export const wordlist: string = '/assets/wordlist_short.txt';

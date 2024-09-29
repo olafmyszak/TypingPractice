@@ -58,12 +58,62 @@
   padding: 20px;
 }
 
+.input-area {
+  display: flex;
+  margin-top: 20px;
+  width: 300px;
+  height: 70px;
+  position: relative;
+  align-items: center;
+}
+
 .word-input {
   padding: 10px;
   font-size: 20px;
   width: 300px;
   text-align: center;
   margin-bottom: 20px; /* Adds space between input and button */
+}
+
+.flash-input {
+  padding: 10px;
+  font-size: 20px;
+  width: 300px;
+  text-align: center;
+  margin-bottom: 20px; /* Adds space between input and button */
+  animation-name: flash;
+  animation-duration: 500ms;
+}
+
+@keyframes flash {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.try-again-message {
+  width: 300px;
+  height: 50px;
+  position: absolute;
+  /*top: -40px; !* Adjust this to control where the message appears *!*/
+  left: 100%;
+  /*top: -50px;*/
+  text-align: center;
+  font-size: 24px;
+  color: red;
+  animation: fadeInOut 1s ease;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .timer {
@@ -79,4 +129,12 @@
   flex-direction: column;
   justify-content: flex-start;
   text-align: left;
+}
+
+.congratulations {
+  position: absolute;
+  bottom: 52%;
+  font-size: 28px;
+  color: lawngreen;
+  animation: fadeInOut 1500ms ease;
 }

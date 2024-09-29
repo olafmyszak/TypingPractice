@@ -1,36 +1,50 @@
-<div class="start-menu" *ngIf="!this.gameStarted; else start">
-  <button mat-raised-button class="start-button" (click)="this.startGame()">START</button>
-</div>
-
-<ng-template #start>
+@if (!this.gameStarted) {
+  <div class="start-menu">
+    <button mat-raised-button class="start-button" (click)="this.startGame()">START</button>
+  </div>
+} @else {
   <div class="game-menu">
     <div class="game-loop">
       <!-- Display the random word in a large font -->
       <h1>{{ randomWord }}</h1>
 
       <!-- Input field for the user to type the word -->
-      <input
-        type="text"
-        [(ngModel)]="userInput"
-        class="word-input"
-        (input)="onInput()"
-        [cdkTrapFocus]="true"
-        [cdkTrapFocusAutoCapture]="true"
-      />
+      <div class="input-area">
+        @if (showTryAgain) {
+          <div class="try-again-message">
+            ❌ Oops! Try Again.
+          </div>
+        }
+
+        <input
+          type="text"
+          [(ngModel)]="userInput"
+          [ngClass]="flashInput ? 'flash-input' : 'word-input'"
+          (input)="onInput()"
+          [cdkTrapFocus]="true"
+          [cdkTrapFocusAutoCapture]="true"
+        />
+      </div>
 
       <!-- Display remaining time in seconds -->
       <div class="timer">
-        Time left: {{ timeLeft / 1000 }} seconds
+        Time left: {{ timeLeft() / 1000 }} seconds
       </div>
+
+      @if (correct) {
+        <div class="congratulations">
+          {{ randomCongrats }}
+        </div>
+      }
 
       <!-- Stop button to end the game -->
       <button mat-raised-button class="stop-button" (click)="this.stopGame()">STOP</button>
     </div>
 
     <div class="stats">
-      <h1>Total attempts: {{this.totalAttempts}}</h1>
-      <h1>Successful attempts: {{this.successfulAttempts}}</h1>
+      <h1>Total attempts: {{ this.totalAttempts }}</h1>
+      <h1>Successful attempts: {{ this.successfulAttempts }}</h1>
     </div>
   </div>
-</ng-template>
+}
 
