@@ -31,11 +31,11 @@
         Time left: {{ timeLeft() / 1000 }} seconds
       </div>
 
-      @if (correct) {
-        <div class="congratulations">
-          {{ randomCongrats }}
-        </div>
-      }
+
+      <div [ngClass]="correct ? 'congratulations-visible' : 'congratulations-hidden'">
+        {{ randomCongrats }}
+      </div>
+
 
       <!-- Stop button to end the game -->
       <button mat-raised-button class="stop-button" (click)="this.stopGame()">STOP</button>

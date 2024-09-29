@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, inject, signal} from '@angular/core';
+import {ChangeDetectorRef, Component, inject, OnInit, signal} from '@angular/core';
 import {MatButton} from "@angular/material/button";
 import {NgClass} from "@angular/common";
 import {FormsModule} from "@angular/forms";
@@ -17,7 +17,7 @@ import {CdkTrapFocus} from "@angular/cdk/a11y";
   templateUrl: './game-area.component.html',
   styleUrl: './game-area.component.css'
 })
-export class GameAreaComponent {
+export class GameAreaComponent implements OnInit {
   gameStarted: boolean = false;
 
   randomWord: string = "";
@@ -41,7 +41,7 @@ export class GameAreaComponent {
 
   randomCongrats = this.congratulations[0];
 
-  timeIntervalSeconds: number = 20;
+  timeIntervalSeconds: number = 10;
   timeLeft = signal(this.timeIntervalSeconds * 1000);
   interval: number = 0;
 
@@ -50,6 +50,10 @@ export class GameAreaComponent {
 
   wordGeneratorService = inject(WordGeneratorService);
   cdr = inject(ChangeDetectorRef);
+
+  ngOnInit() {
+    this.generateRandomWord(); // Populate the wordlist
+  }
 
   startGame(): void {
     this.gameStarted = true;
@@ -91,12 +95,17 @@ export class GameAreaComponent {
       ++this.totalAttempts;
       this.generateRandomWord();
       this.clearUserInput(0);
+
+      if (this.timeIntervalSeconds > 1.0) {
+        this.timeIntervalSeconds -= 0.5; // Decrease time interval for typing in the word by 0.5 second if correctly typed
+      }
       this.startTimer();
 
       this.randomCongrats = this.congratulations[Math.floor(Math.random() * this.congratulations.length)]
 
       this.showTryAgain = false;
       this.flashInput = false;
+
       setTimeout(() => {
         this.correct = false;
       }, 900);
@@ -110,6 +119,7 @@ export class GameAreaComponent {
 
     this.interval = setInterval(() => {
       if (this.timeLeft() <= 0) {
+        this.timeIntervalSeconds += 0.5; // Increase time interval for typing in the word by 0.5 second if time ran out
         clearInterval(this.interval);
         ++this.totalAttempts;
         this.generateRandomWord();
