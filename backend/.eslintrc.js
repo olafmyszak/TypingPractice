@@ -28,6 +28,7 @@ module.exports = {
         '@typescript-eslint/explicit-member-accessibility': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off', // does not make sense with controllers
         '@typescript-eslint/no-extraneous-class': 'off',
+        'no-console': 'off',
     },
     overrides: [
         {

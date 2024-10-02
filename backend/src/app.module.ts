@@ -9,7 +9,6 @@ import { AuthModule } from './auth/auth.module';
 @Module({
     imports: [
         ConfigModule.forRoot(),
-
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -24,9 +23,7 @@ import { AuthModule } from './auth/auth.module';
                 synchronize: true, // Use for development only
             }),
         }),
-
         UserModule,
-
         AuthModule,
     ],
     controllers: [AppController],

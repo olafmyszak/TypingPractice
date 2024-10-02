@@ -33,7 +33,7 @@ describe('UserController', () => {
             ],
         }).compile();
 
-        controller = module.get<UserController>(UserController);
+        controller = module.get(UserController);
     });
 
     it('should be defined', () => {

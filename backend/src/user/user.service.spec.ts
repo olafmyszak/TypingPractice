@@ -31,7 +31,7 @@ describe('UserService', () => {
             ],
         }).compile();
 
-        service = module.get<UserService>(UserService);
+        service = module.get(UserService);
     });
 
     it('should be defined', () => {
