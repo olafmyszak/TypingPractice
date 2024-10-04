@@ -8,6 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from '../../environments/environment';
 
 @Component({
     selector: 'app-login',
@@ -36,7 +37,7 @@ export class LoginComponent {
                     if (token === null) {
                         this.openSnackBar('Invalid username or password', 'OK');
                     } else {
-                        localStorage.setItem('access_token', token);
+                        localStorage.setItem(environment.access_token, token);
                         void this.router.navigate(['/']);
                     }
                 });

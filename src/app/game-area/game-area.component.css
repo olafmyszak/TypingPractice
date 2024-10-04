@@ -83,6 +83,19 @@
     background-color: #f8fc34 !important;
 }
 
+.logout-button {
+    position: relative;
+    padding: 5px 20px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50px;
+    box-shadow: 0 5px 15px rgba(30, 144, 255, 0.4);
+    transition: all 0.3s ease;
+    color: black !important;
+    background-color: #08cc1c !important;
+    text-decoration: none;
+}
+
 .game-loop {
     display: flex;
     flex-direction: column;

@@ -12,6 +12,7 @@ import { WordGeneratorService } from '../word-generator.service';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { LoginComponent } from "../login/login.component";
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 @Component({
     selector: 'app-game-area',
@@ -54,6 +55,7 @@ export class GameAreaComponent implements OnInit {
     wordGeneratorService = inject(WordGeneratorService);
     cdr = inject(ChangeDetectorRef);
     router = inject(Router);
+    authService = inject(AuthService);
 
     ngOnInit(): void {
         this.generateRandomWord(); // Populate the wordlist

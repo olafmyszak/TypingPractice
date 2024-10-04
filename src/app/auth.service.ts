@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from '../environments/environment';
 
@@ -8,6 +9,7 @@ import { environment } from '../environments/environment';
 })
 export class AuthService {
     http = inject(HttpClient);
+    jwtHelperService = inject(JwtHelperService);
 
     login(username: string, password: string): Observable<string | null> {
         return this.http
@@ -18,6 +20,17 @@ export class AuthService {
                 map((res) => res.access_token),
                 catchError(this.handleError('login', null))
             );
+    }
+
+    logout(): void {
+        localStorage.removeItem(environment.access_token);
+    }
+
+    isAuthenticated(): boolean {
+        const result = !this.jwtHelperService.isTokenExpired();
+
+        console.log(result);
+        return result;
     }
 
     private handleError<T>(operation = 'operation', result?: T) {
