@@ -131,7 +131,7 @@ export class GameAreaComponent implements OnInit {
 
         clearInterval(this.interval);
 
-        this.interval = setInterval(() => {
+        this.interval = window.setInterval(() => {
             if (this.timeLeft() <= 0) {
                 this.timeIntervalSeconds += 0.5; // Increase time interval for typing in the word by 0.5 second if time ran out
                 clearInterval(this.interval);
