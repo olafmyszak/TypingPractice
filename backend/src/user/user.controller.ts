@@ -21,6 +21,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateUserStatsDto } from './dto/update-user-stats.dto';
+import { UserStats } from './entities/user-stats.entity';
+import { UserStatsResponseDto } from './dto/user-stats-response.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -57,7 +59,7 @@ export class UserController {
     @Get()
     @ApiOperation({ summary: 'Get all users in the database' })
     @ApiResponse({
-        status: 200,
+        status: HttpStatus.OK,
         description: 'The found records',
         type: UserResponseDto,
     })
@@ -67,10 +69,23 @@ export class UserController {
 
     @Patch(':username/stats')
     @ApiOperation({ summary: 'Update user typing performance statistcs' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'User stats after updating',
+        type: UserStatsResponseDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.NOT_FOUND,
+        description: 'User with the given username was not found',
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Request body is ill-formed',
+    })
     async updateUserStats(
         @Param('username') username: string,
         @Body() updateUserStatsdto: UpdateUserStatsDto,
-    ) {
+    ): Promise<UserStatsResponseDto> {
         const result = await this.userService.updateStats(
             username,
             updateUserStatsdto,
@@ -80,7 +95,10 @@ export class UserController {
             throw new NotFoundException(`User '${username}' not found`);
         }
 
-        return result;
+        return {
+            totalAttempts: result.totalAttempts,
+            successfulAttempts: result.successfulAttempts,
+        };
     }
 
     // @Get(':id')
