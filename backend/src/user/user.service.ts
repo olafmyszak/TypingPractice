@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserStats } from './entities/user-stats.entity';
 import { UpdateUserStatsDto } from './dto/update-user-stats.dto';
+import { Role } from '../auth/role/role.enum';
 
 const saltRounds = 10;
 
@@ -29,7 +30,9 @@ export class UserService {
 
         const user = this.usersRepository.create(createUserDto);
         user.password = await bcrypt.hash(user.password, saltRounds);
+        user.roles = [Role.User];
         user.stats = new UserStats();
+
         return this.usersRepository.save(user);
     }
 

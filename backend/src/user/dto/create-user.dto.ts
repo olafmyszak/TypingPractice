@@ -6,7 +6,7 @@ import {
     IsNotEmpty,
     IsString,
 } from 'class-validator';
-import { Role } from '../../role/role.enum';
+import { Role } from '../../auth/role/role.enum';
 
 export class CreateUserDto {
     @ApiProperty({
@@ -25,14 +25,14 @@ export class CreateUserDto {
     @IsNotEmpty()
     password: string;
 
-    @ApiProperty({
-        enum: Role,
-        required: true,
-        isArray: true,
-    })
-    @IsNotEmpty()
-    @IsArray()
-    @ArrayNotEmpty()
-    @IsEnum(Role, { each: true })
-    roles: Role[];
+    // @ApiProperty({
+    //     enum: Role,
+    //     required: true,
+    //     isArray: true,
+    // })
+    // @IsNotEmpty()
+    // @IsArray()
+    // @ArrayNotEmpty()
+    // @IsEnum(Role, { each: true })
+    // roles: Role[];
 }

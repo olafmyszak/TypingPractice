@@ -19,9 +19,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 // import { User } from './entities/user.entity';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserResponseDto } from './dto/user-response.dto';
+import { CreateUserResponseDto } from './dto/create-user-response.dto';
 import { UpdateUserStatsDto } from './dto/update-user-stats.dto';
-import { UserStats } from './entities/user-stats.entity';
 import { UserStatsResponseDto } from './dto/user-stats-response.dto';
 
 @ApiTags('User')
@@ -35,7 +34,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.CREATED,
         description: 'The record has been successfully created.',
-        type: UserResponseDto,
+        type: CreateUserResponseDto,
     })
     @ApiResponse({
         status: HttpStatus.CONFLICT,
@@ -44,7 +43,7 @@ export class UserController {
     @ApiBody({ type: CreateUserDto })
     async create(
         @Body() createUserDto: CreateUserDto,
-    ): Promise<UserResponseDto> {
+    ): Promise<CreateUserResponseDto> {
         const result = await this.userService.create(createUserDto);
 
         if (!result) {
@@ -61,9 +60,9 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'The found records',
-        type: UserResponseDto,
+        type: CreateUserResponseDto,
     })
-    async findAll(): Promise<UserResponseDto[]> {
+    async findAll(): Promise<CreateUserResponseDto[]> {
         return this.userService.findAll();
     }
 
