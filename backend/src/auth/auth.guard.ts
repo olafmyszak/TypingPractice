@@ -31,6 +31,8 @@ export class AuthGuard implements CanActivate {
                 secret: this.configService.get('JWT_SECRET'),
             });
 
+            // 💡 We're assigning the payload to the request object here
+            // so that we can access it in our route handlers
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             request.user = payload;
         } catch {

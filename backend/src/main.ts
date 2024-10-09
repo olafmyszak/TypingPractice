@@ -45,6 +45,17 @@ async function bootstrap() {
         .setTitle('Typing Practice')
         .setDescription('API for the typing practice game')
         .setVersion('1.0')
+        .addBearerAuth(
+            {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+                name: 'JWT',
+                description: 'Enter JWT token',
+                in: 'header',
+            },
+            'JWT-auth',
+        )
         .build();
 
     const options: SwaggerDocumentOptions = {
@@ -56,7 +67,11 @@ async function bootstrap() {
 
     SwaggerModule.setup('api', app, document);
 
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(
+        new ValidationPipe({
+            transform: true,
+        }),
+    );
 
     await app.listen(3000);
     console.log(`Application is running on: ${await app.getUrl()}`);

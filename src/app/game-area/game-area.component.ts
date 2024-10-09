@@ -1,23 +1,17 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    inject,
-    OnInit,
-    signal,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
-import { NgClass } from '@angular/common';
+import { AsyncPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { WordGeneratorService } from '../word-generator.service';
+import { WordGeneratorService } from '../services/word-generator.service';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
-import { LoginComponent } from "../login/login.component";
+import { LoginComponent } from '../login/login.component';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
     selector: 'app-game-area',
     standalone: true,
-    imports: [MatButton, CdkTrapFocus, NgClass, FormsModule, LoginComponent, RouterModule],
+    imports: [AsyncPipe, MatButton, CdkTrapFocus, NgClass, FormsModule, LoginComponent, RouterModule],
     templateUrl: './game-area.component.html',
     styleUrl: './game-area.component.css',
 })
@@ -57,8 +51,13 @@ export class GameAreaComponent implements OnInit {
     router = inject(Router);
     authService = inject(AuthService);
 
+    isAuthenticated$ = this.authService.authStatus$;
+
+    correctAudio = new Audio(correctSoundPath);
+
     ngOnInit(): void {
         this.generateRandomWord(); // Populate the wordlist
+        this.correctAudio.load();
     }
 
     startGame(): void {
@@ -116,9 +115,10 @@ export class GameAreaComponent implements OnInit {
             this.randomCongrats =
                 this.congratulations[
                     Math.floor(Math.random() * this.congratulations.length)
-                ];
+                    ];
 
-            this.playSound(correctSoundPath);
+            // this.playSound(correctSoundPath);
+            void this.correctAudio.play();
 
             setTimeout(() => {
                 this.correct = false;
@@ -151,10 +151,8 @@ export class GameAreaComponent implements OnInit {
         }, timeout);
     }
 
-    playSound(path: string): void {
-        const audio = new Audio(path);
-        audio.load();
-        void audio.play();
+    logout() {
+        this.authService.logout();
     }
 }
 

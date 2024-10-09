@@ -1,0 +1,17 @@
+<div class="login-container">
+    <h2>Register</h2>
+    <form (ngSubmit)="register()" [formGroup]="form">
+        <label for="user-name">Username:</label>
+        <input formControlName="username" id="user-name" type="text" />
+
+        <label for="password">Password:</label>
+        <input formControlName="password" id="password" type="password" />
+
+        <label for="confirmPassword">Confirm password:</label>
+        <input formControlName="confirmPassword" id="confirmPassword" type="password" />
+
+        <button [disabled]="!form.valid" class="btn" type="submit">
+            Login
+        </button>
+    </form>
+</div>

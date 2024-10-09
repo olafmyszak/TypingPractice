@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Role } from '../role/role.enum';
 
 describe('UserService', () => {
     let service: UserService;
@@ -44,14 +45,14 @@ describe('UserService', () => {
             const dto: CreateUserDto = {
                 username: 'test',
                 password: 'password',
+                roles: [Role.User],
             };
 
             jest.spyOn(mockUserRepository, 'create').mockImplementation(
                 (createUserDto: CreateUserDto): User => {
                     return {
                         id: Date.now(),
-                        username: createUserDto.username,
-                        password: createUserDto.password,
+                        ...createUserDto,
                     };
                 },
             );
@@ -78,8 +79,18 @@ describe('UserService', () => {
         it('should return an array of users', async () => {
             // Arrange
             const users: User[] = [
-                { id: 1, username: 'random', password: '123' },
-                { id: 2, username: 'test', password: 'password' },
+                {
+                    id: 1,
+                    username: 'random',
+                    password: '123',
+                    roles: [Role.User],
+                },
+                {
+                    id: 2,
+                    username: 'test',
+                    password: 'password',
+                    roles: [Role.User],
+                },
             ];
 
             jest.spyOn(mockUserRepository, 'find').mockResolvedValue(users);

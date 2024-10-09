@@ -1,14 +1,10 @@
 import { Component, inject } from '@angular/core';
-import {
-    FormControl,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { environment } from '../../environments/environment';
+import { catchError, EMPTY } from 'rxjs';
+import { HttpStatusCode } from '@angular/common/http';
 
 @Component({
     selector: 'app-login',
@@ -31,16 +27,19 @@ export class LoginComponent {
         const val = this.form.value;
 
         if (val.username && val.password) {
-            this.authService
-                .login(val.username, val.password)
-                .subscribe((token) => {
-                    if (token === null) {
+            this.authService.login(val.username, val.password).pipe(
+                catchError((err) => {
+                    if (err.status === 0) {
+                        this.openSnackBar('Server connection problem', 'OK');
+                    } else if (err.status === HttpStatusCode.Unauthorized) {
                         this.openSnackBar('Invalid username or password', 'OK');
-                    } else {
-                        localStorage.setItem(environment.access_token, token);
-                        void this.router.navigate(['/']);
                     }
-                });
+
+                    return EMPTY;
+                }),
+            ).subscribe({
+                next: () => void this.router.navigate(['/']),
+            });
         }
     }
 

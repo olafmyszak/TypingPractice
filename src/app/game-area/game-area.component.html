@@ -10,23 +10,26 @@
 } @else {
     <div class="game-menu">
         <div class="auth-container">
-            @if (!authService.isAuthenticated()) {
+            @if (isAuthenticated$ | async) {
+                <button
+                    mat-raised-button
+                    class="login-button"
+                    (click)="logout()"
+                    [routerLink]="['/']">
+                    Sign out
+                </button>
+            } @else {
                 <button
                     mat-raised-button
                     class="login-button"
                     [routerLink]="['/login']">
                     Sign in
                 </button>
-                <button mat-raised-button class="register-button">
-                    Sign up
-                </button>
-            } @else {
                 <button
                     mat-raised-button
-                    class="login-button"
-                    (click)="authService.logout()"
-                    [routerLink]="['']">
-                    Sign out
+                    class="register-button"
+                    [routerLink]="['/register']">
+                    Sign up
                 </button>
             }
         </div>

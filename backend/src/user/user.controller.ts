@@ -5,6 +5,11 @@ import {
     Body,
     UseInterceptors,
     ClassSerializerInterceptor,
+    HttpStatus,
+    Patch,
+    Param,
+    NotFoundException,
+    ConflictException,
     // Patch,
     // Param,
     // Delete,
@@ -12,9 +17,10 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+// import { User } from './entities/user.entity';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserResponseDto } from './dto/user-response.dto';
+import { UpdateUserStatsDto } from './dto/update-user-stats.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -22,16 +28,30 @@ import { UserResponseDto } from './dto/user-response.dto';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Post()
-    @ApiOperation({ summary: 'Create User' })
+    @Post('register')
+    @ApiOperation({ summary: 'Register a new User' })
     @ApiResponse({
-        status: 201,
+        status: HttpStatus.CREATED,
         description: 'The record has been successfully created.',
+        type: UserResponseDto,
     })
-    // @ApiResponse({ status: 403, description: 'Forbidden.' })
+    @ApiResponse({
+        status: HttpStatus.CONFLICT,
+        description: 'User already exists.',
+    })
     @ApiBody({ type: CreateUserDto })
-    async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-        return this.userService.create(createUserDto);
+    async create(
+        @Body() createUserDto: CreateUserDto,
+    ): Promise<UserResponseDto> {
+        const result = await this.userService.create(createUserDto);
+
+        if (!result) {
+            throw new ConflictException(
+                `Username '${createUserDto.username}' already exists`,
+            );
+        }
+
+        return result;
     }
 
     @Get()
@@ -41,8 +61,26 @@ export class UserController {
         description: 'The found records',
         type: UserResponseDto,
     })
-    async findAll(): Promise<User[]> {
+    async findAll(): Promise<UserResponseDto[]> {
         return this.userService.findAll();
+    }
+
+    @Patch(':username/stats')
+    @ApiOperation({ summary: 'Update user typing performance statistcs' })
+    async updateUserStats(
+        @Param('username') username: string,
+        @Body() updateUserStatsdto: UpdateUserStatsDto,
+    ) {
+        const result = await this.userService.updateStats(
+            username,
+            updateUserStatsdto,
+        );
+
+        if (!result) {
+            throw new NotFoundException(`User '${username}' not found`);
+        }
+
+        return result;
     }
 
     // @Get(':id')
