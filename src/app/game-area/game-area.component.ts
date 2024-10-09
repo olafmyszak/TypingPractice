@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
-import { AsyncPipe, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WordGeneratorService } from '../services/word-generator.service';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
@@ -8,11 +8,15 @@ import { LoginComponent } from '../login/login.component';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
+import { catchError, EMPTY } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpStatusCode } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-game-area',
     standalone: true,
-    imports: [AsyncPipe, MatButton, CdkTrapFocus, NgClass, FormsModule, LoginComponent, RouterModule],
+    imports: [MatButton, CdkTrapFocus, NgClass, FormsModule, LoginComponent, RouterModule],
     templateUrl: './game-area.component.html',
     styleUrl: './game-area.component.css',
 })
@@ -52,15 +56,37 @@ export class GameAreaComponent implements OnInit {
     router = inject(Router);
     authService = inject(AuthService);
     userService = inject(UserService);
+    snackBar = inject(MatSnackBar);
 
-    isAuthenticated$ = this.authService.authStatus$;
+    isAuthenticated = toSignal(this.authService.authStatus$, {initialValue: false});
 
     correctAudio = new Audio(correctSoundPath);
 
     ngOnInit(): void {
         this.generateRandomWord(); // Populate the wordlist
         this.correctAudio.load();
+
+        if (this.isAuthenticated()) {
+            this.userService.getStats().pipe(
+                catchError((err) => {
+                    if (err.status === 0) {
+                        this.openSnackBar('Server connection problem', 'OK');
+                    }
+
+                    return EMPTY;
+                }),
+            ).subscribe({
+                next: ({ totalAttempts, successfulAttempts }) => {
+                    this.totalAttempts = totalAttempts;
+                    this.successfulAttempts = successfulAttempts;
+                },
+            });
+        } else {
+            this.totalAttempts = 0;
+            this.successfulAttempts = 0;
+        }
     }
+
 
     startGame(): void {
         this.gameStarted = true;
@@ -154,8 +180,33 @@ export class GameAreaComponent implements OnInit {
     }
 
     logout() {
-        // this.userService.updateStats()
-        this.authService.logout();
+        this.userService.updateStats({
+            totalAttempts: this.totalAttempts,
+            successfulAttempts: this.successfulAttempts,
+        }).pipe(
+            catchError((err) => {
+                if (err.status === 0) {
+                    this.openSnackBar('Server connection problem', 'OK');
+                } else if (err.status === HttpStatusCode.NotFound) {
+                    this.openSnackBar('Authentication problem', 'OK');
+                }
+
+                return EMPTY;
+            }),
+        ).subscribe({
+            next: () => {
+                this.authService.logout();
+                // location.reload();
+                this.ngOnInit();
+            }
+        });
+    }
+
+    private openSnackBar(message: string, action: string) {
+        this.snackBar.open(message, action, {
+            duration: 2000,
+            verticalPosition: 'bottom',
+        });
     }
 }
 

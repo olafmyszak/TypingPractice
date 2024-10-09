@@ -32,12 +32,12 @@ export interface SignInDto {
     password: string;
 }
 
-export interface UpdateUserStatsDto {
+export interface UserStatsDto {
     totalAttempts: number;
     successfulAttempts: number;
 }
 
-export interface UpdateUserStatsResponse {
+export interface UserStatsResponse {
     totalAttempts: number;
     successfulAttempts: number;
 }

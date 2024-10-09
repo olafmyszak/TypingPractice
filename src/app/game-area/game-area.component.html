@@ -10,7 +10,7 @@
 } @else {
     <div class="game-menu">
         <div class="auth-container">
-            @if (isAuthenticated$ | async) {
+            @if (isAuthenticated()) {
                 <button
                     mat-raised-button
                     class="login-button"

@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import {
     RegisterUserDto,
-    UpdateUserStatsDto,
-    UpdateUserStatsResponse,
+    UserStatsDto,
+    UserStatsResponse,
     UserRegistrationResponse,
 } from '../models/user.model';
 import { environment } from '../../environments/environment';
@@ -27,8 +27,19 @@ export class UserService {
         );
     }
 
-    updateStats(updateUserStatsDto: UpdateUserStatsDto): Observable<UpdateUserStatsResponse> {
-        return this.http.patch<UpdateUserStatsResponse>(`${environment.baseUrl}/user/stats`, updateUserStatsDto).pipe(
+    getStats(): Observable<UserStatsResponse> {
+        return this.http.get<UserStatsResponse>(`${environment.baseUrl}/user/stats`).pipe(
+            tap({
+                error: err => {
+                    console.error(err);
+                    console.log(`Get stats failed: ${err.message}`);
+                }
+            })
+        );
+    }
+
+    updateStats(userStatsDto: UserStatsDto): Observable<UserStatsResponse> {
+        return this.http.patch<UserStatsResponse>(`${environment.baseUrl}/user/stats`, userStatsDto).pipe(
             tap({
                 error: err => {
                     console.error(err);
