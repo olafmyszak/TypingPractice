@@ -11,14 +11,13 @@ A fun and interactive web app to improve typing speed and accuracy, built using 
     ```bash
     git clone https://github.com/olafmyszak/TypingPractice.git
     ```
+
 2. Install dependencies:
     ```bash
     npm install
-   ```
+    ```
 3. Start the development server:
     ```bash
-   ng serve
+    ng serve
     ```
-4. Navigate to ```http://localhost:4200```
-
-
+4. Navigate to `http://localhost:4200`

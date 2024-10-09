@@ -1,50 +1,82 @@
 @if (!this.gameStarted) {
-  <div class="start-menu">
-    <button mat-raised-button class="start-button" (click)="this.startGame()">START</button>
-  </div>
+    <div class="start-menu">
+        <button
+            mat-raised-button
+            class="start-button"
+            (click)="this.startGame()">
+            START
+        </button>
+    </div>
 } @else {
-  <div class="game-menu">
-    <div class="game-loop">
-      <!-- Display the random word in a large font -->
-      <h1>{{ randomWord }}</h1>
+    <div class="game-menu">
+        <div class="auth-container">
+            @if (isAuthenticated()) {
+                <button
+                    mat-raised-button
+                    class="login-button"
+                    (click)="logout()"
+                    [routerLink]="['/']">
+                    Sign out
+                </button>
+            } @else {
+                <button
+                    mat-raised-button
+                    class="login-button"
+                    [routerLink]="['/login']">
+                    Sign in
+                </button>
+                <button
+                    mat-raised-button
+                    class="register-button"
+                    [routerLink]="['/register']">
+                    Sign up
+                </button>
+            }
+        </div>
 
-      <!-- Input field for the user to type the word -->
-      <div class="input-area">
-        @if (showTryAgain) {
-          <div class="try-again-message">
-            ❌ Oops! Try Again.
-          </div>
-        }
+        <div class="game-loop">
+            <!-- Display the random word in a large font -->
+            <h1>{{ randomWord }}</h1>
 
-        <input
-          type="text"
-          [(ngModel)]="userInput"
-          [ngClass]="flashInput ? 'flash-input' : 'word-input'"
-          (input)="onInput()"
-          [cdkTrapFocus]="true"
-          [cdkTrapFocusAutoCapture]="true"
-        />
-      </div>
+            <!-- Input field for the user to type the word -->
+            <div class="input-area">
+                @if (showTryAgain) {
+                    <div class="try-again-message">❌ Oops! Try Again.</div>
+                }
 
-      <!-- Display remaining time in seconds -->
-      <div class="timer">
-        Time left: {{ timeLeft() / 1000 }} seconds
-      </div>
+                <input
+                    type="text"
+                    [(ngModel)]="userInput"
+                    [ngClass]="flashInput ? 'flash-input' : 'word-input'"
+                    (input)="onInput()"
+                    [cdkTrapFocus]="true"
+                    [cdkTrapFocusAutoCapture]="true" />
+            </div>
 
+            <!-- Display remaining time in seconds -->
+            <div class="timer">Time left: {{ timeLeft() / 1000 }} seconds</div>
 
-      <div [ngClass]="correct ? 'congratulations-visible' : 'congratulations-hidden'">
-        {{ randomCongrats }}
-      </div>
+            <div
+                [ngClass]="
+                    correct
+                        ? 'congratulations-visible'
+                        : 'congratulations-hidden'
+                ">
+                {{ randomCongrats }}
+            </div>
 
+            <!-- Stop button to end the game -->
+            <button
+                mat-raised-button
+                class="stop-button"
+                (click)="this.stopGame()">
+                STOP
+            </button>
+        </div>
 
-      <!-- Stop button to end the game -->
-      <button mat-raised-button class="stop-button" (click)="this.stopGame()">STOP</button>
+        <div class="stats">
+            <h1>Total attempts: {{ this.totalAttempts }}</h1>
+            <h1>Successful attempts: {{ this.successfulAttempts }}</h1>
+        </div>
     </div>
-
-    <div class="stats">
-      <h1>Total attempts: {{ this.totalAttempts }}</h1>
-      <h1>Successful attempts: {{ this.successfulAttempts }}</h1>
-    </div>
-  </div>
 }
-

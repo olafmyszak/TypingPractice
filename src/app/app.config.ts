@@ -1,16 +1,35 @@
-import {ApplicationConfig, provideExperimentalZonelessChangeDetection} from '@angular/core';
-import {provideRouter} from '@angular/router';
+import { ApplicationConfig, importProvidersFrom, provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { provideRouter, withRouterConfig } from '@angular/router';
 
-import {routes} from './app.routes';
-import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import { routes } from './app.routes';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
+import { JwtModule } from '@auth0/angular-jwt';
+import { environment } from '../environments/environment';
+import { authInterceptor } from './auth.interceptor';
+
+export function tokenGetter() {
+    return localStorage.getItem(environment.access_token);
+}
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideExperimentalZonelessChangeDetection(),
-    provideRouter(routes),
-    provideAnimationsAsync(),
-    provideHttpClient(withInterceptorsFromDi()),
-  ]
+    providers: [
+        provideExperimentalZonelessChangeDetection(),
+        provideRouter(
+            routes,
+            withRouterConfig({ onSameUrlNavigation: 'reload' }),
+        ),
+        provideAnimationsAsync(),
+        importProvidersFrom(
+            JwtModule.forRoot({
+                config: {
+                    tokenGetter: tokenGetter,
+                },
+            }),
+        ),
+        provideHttpClient(
+            withInterceptors([authInterceptor]),
+            withInterceptorsFromDi()),
+    ],
 };

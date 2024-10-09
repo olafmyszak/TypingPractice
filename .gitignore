@@ -356,3 +356,5 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/angular,node,jetbrains+all,webstorm+all
 /ProjectRequirements.md
+.env
+todo.md
