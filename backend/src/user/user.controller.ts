@@ -22,8 +22,8 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { CreateUserResponseDto } from './dto/create-user-response.dto';
-import { UpdateUserStatsDto } from './dto/update-user-stats.dto';
-import { UpdateUserStatsResponse } from './dto/update-user-stats-response.dto';
+import { UserStatsDto } from './dto/user-stats.dto';
+import { UserStatsResponse } from './dto/user-stats-response.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('User')
@@ -70,13 +70,42 @@ export class UserController {
     }
 
     @UseGuards(AuthGuard)
+    @Get('stats')
+    @ApiOperation({ summary: 'Get user typing performance statistcs' })
+    @ApiBearerAuth('JWT-auth')
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'User stats',
+        type: UserStatsResponse,
+    })
+    @ApiResponse({
+        status: HttpStatus.NOT_FOUND,
+        description: 'User with the given username was not found',
+    })
+    async getUserStats(@Req() req: any): Promise<UserStatsResponse> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        const id: number = req.user.sub;
+
+        const result = await this.userService.getStats(id);
+
+        if (!result) {
+            throw new NotFoundException(`User not found`);
+        }
+
+        return {
+            totalAttempts: result.totalAttempts,
+            successfulAttempts: result.successfulAttempts,
+        };
+    }
+
+    @UseGuards(AuthGuard)
     @Patch('stats')
     @ApiOperation({ summary: 'Update user typing performance statistcs' })
     @ApiBearerAuth('JWT-auth')
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'User stats after updating',
-        type: UpdateUserStatsResponse,
+        type: UserStatsResponse,
     })
     @ApiResponse({
         status: HttpStatus.NOT_FOUND,
@@ -89,18 +118,15 @@ export class UserController {
     })
     async updateUserStats(
         @Req() req: any,
-        @Body() updateUserStatsDto: UpdateUserStatsDto,
-    ): Promise<UpdateUserStatsResponse> {
+        @Body() userStatsDto: UserStatsDto,
+    ): Promise<UserStatsResponse> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        const username: string = req.user.username;
+        const id: number = req.user.sub;
 
-        const result = await this.userService.updateStats(
-            username,
-            updateUserStatsDto,
-        );
+        const result = await this.userService.updateStats(id, userStatsDto);
 
         if (!result) {
-            throw new NotFoundException(`User '${username}' not found`);
+            throw new NotFoundException(`User not found`);
         }
 
         return {
@@ -108,19 +134,4 @@ export class UserController {
             successfulAttempts: result.successfulAttempts,
         };
     }
-
-    // @Get(':id')
-    // findOne(@Param('id') id: string) {
-    //     return this.userService.findOne(+id);
-    // }
-
-    // @Patch(':id')
-    // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    //     return this.userService.update(+id, updateUserDto);
-    // }
-
-    // @Delete(':id')
-    // remove(@Param('id') id: string) {
-    //     return this.userService.remove(+id);
-    // }
 }

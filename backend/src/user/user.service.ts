@@ -5,7 +5,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserStats } from './entities/user-stats.entity';
-import { UpdateUserStatsDto } from './dto/update-user-stats.dto';
+import { UserStatsDto } from './dto/user-stats.dto';
 import { Role } from '../auth/role/role.enum';
 
 const saltRounds = 10;
@@ -44,11 +44,18 @@ export class UserService {
         return this.usersRepository.findOneBy({ username });
     }
 
-    async updateStats(
-        username: string,
-        updateUserStatsdto: UpdateUserStatsDto,
-    ) {
-        const user = await this.findOneByUsername(username);
+    async getStats(id: number) {
+        const user = await this.usersRepository.findOneBy({ id });
+
+        if (!user) {
+            return null;
+        }
+
+        return user.stats;
+    }
+
+    async updateStats(id: number, updateUserStatsdto: UserStatsDto) {
+        const user = await this.usersRepository.findOneBy({ id });
 
         if (!user) {
             return null;
