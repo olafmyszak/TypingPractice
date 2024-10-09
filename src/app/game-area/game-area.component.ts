@@ -7,6 +7,7 @@ import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { LoginComponent } from '../login/login.component';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { UserService } from '../services/user.service';
 
 @Component({
     selector: 'app-game-area',
@@ -50,6 +51,7 @@ export class GameAreaComponent implements OnInit {
     cdr = inject(ChangeDetectorRef);
     router = inject(Router);
     authService = inject(AuthService);
+    userService = inject(UserService);
 
     isAuthenticated$ = this.authService.authStatus$;
 
@@ -152,6 +154,7 @@ export class GameAreaComponent implements OnInit {
     }
 
     logout() {
+        // this.userService.updateStats()
         this.authService.logout();
     }
 }

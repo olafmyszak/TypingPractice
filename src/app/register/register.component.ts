@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, EMPTY } from 'rxjs';
 import { HttpStatusCode } from '@angular/common/http';
 import { passwordMatchValidator } from '../shared/password-matches.directive';
+import { UserService } from '../services/user.service';
 
 @Component({
     selector: 'app-register',
@@ -25,13 +25,29 @@ export class RegisterComponent {
     }, { validators: passwordMatchValidator() });
 
     router = inject(Router);
-    authService = inject(AuthService);
+    userService = inject(UserService);
     snackBar = inject(MatSnackBar);
 
     register(): void {
         const val = this.form.value;
 
         if (val.username && val.password && val.confirmPassword) {
+            this.userService.register({ username: val.username, password: val.password }).pipe(
+                catchError((err) => {
+                    if (err.status === 0) {
+                        this.openSnackBar('Server connection problem', 'OK');
+                    } else if (err.status === HttpStatusCode.Conflict) {
+                        this.openSnackBar('Username is taken', 'OK');
+                    }
+
+                    return EMPTY;
+                }),
+            ).subscribe({
+                next: () => {
+                    this.openSnackBar('You can now sign in', 'OK');
+                    void this.router.navigate(['/']);
+                },
+            });
 
         }
     }

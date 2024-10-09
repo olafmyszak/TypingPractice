@@ -7,21 +7,24 @@ import {
     ClassSerializerInterceptor,
     HttpStatus,
     Patch,
-    Param,
     NotFoundException,
     ConflictException,
-    // Patch,
-    // Param,
-    // Delete,
+    Req,
+    UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
-// import { User } from './entities/user.entity';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { CreateUserResponseDto } from './dto/create-user-response.dto';
 import { UpdateUserStatsDto } from './dto/update-user-stats.dto';
-import { UserStatsResponseDto } from './dto/user-stats-response.dto';
+import { UpdateUserStatsResponse } from './dto/update-user-stats-response.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('User')
 @Controller('user')
@@ -66,12 +69,14 @@ export class UserController {
         return this.userService.findAll();
     }
 
-    @Patch(':username/stats')
+    @UseGuards(AuthGuard)
+    @Patch('stats')
     @ApiOperation({ summary: 'Update user typing performance statistcs' })
+    @ApiBearerAuth('JWT-auth')
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'User stats after updating',
-        type: UserStatsResponseDto,
+        type: UpdateUserStatsResponse,
     })
     @ApiResponse({
         status: HttpStatus.NOT_FOUND,
@@ -79,15 +84,19 @@ export class UserController {
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST,
-        description: 'Request body is ill-formed',
+        description:
+            'Request body is ill-formed (ensure that successfulAttempts <= totalAttempts)',
     })
     async updateUserStats(
-        @Param('username') username: string,
-        @Body() updateUserStatsdto: UpdateUserStatsDto,
-    ): Promise<UserStatsResponseDto> {
+        @Req() req: any,
+        @Body() updateUserStatsDto: UpdateUserStatsDto,
+    ): Promise<UpdateUserStatsResponse> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        const username: string = req.user.username;
+
         const result = await this.userService.updateStats(
             username,
-            updateUserStatsdto,
+            updateUserStatsDto,
         );
 
         if (!result) {

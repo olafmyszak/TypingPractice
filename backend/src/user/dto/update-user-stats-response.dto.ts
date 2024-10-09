@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserStatsResponseDto {
+export class UpdateUserStatsResponse {
     @ApiProperty({ example: 20 })
     totalAttempts: number;
 

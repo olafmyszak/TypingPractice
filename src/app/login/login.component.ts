@@ -27,7 +27,7 @@ export class LoginComponent {
         const val = this.form.value;
 
         if (val.username && val.password) {
-            this.authService.login(val.username, val.password).pipe(
+            this.authService.login({ username: val.username, password: val.password }).pipe(
                 catchError((err) => {
                     if (err.status === 0) {
                         this.openSnackBar('Server connection problem', 'OK');

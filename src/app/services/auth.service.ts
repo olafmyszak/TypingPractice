@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, of, Subscription, switchMap, tap, timer } from 'rxjs';
 import { environment } from '../../environments/environment';
+import {  SignInDto } from '../models/user.model';
 
 @Injectable({
     providedIn: 'root',
@@ -21,9 +22,9 @@ export class AuthService {
 
     timerSub$: Subscription = Subscription.EMPTY;
 
-    login(username: string, password: string) {
+    login(signInDto: SignInDto) {
         return this.http
-            .post<{ access_token: string; }>(`${environment.baseUrl}/auth/login`, { username, password }).pipe(
+            .post<{ access_token: string; }>(`${environment.baseUrl}/auth/login`, signInDto).pipe(
                 tap({
                     next: res => {
                         localStorage.setItem(environment.access_token, res.access_token);
@@ -41,10 +42,6 @@ export class AuthService {
     logout(): void {
         localStorage.removeItem(environment.access_token);
         this.authStatusSubject.next(false);
-    }
-
-    register(username: string, password: string) {
-
     }
 
     private startTokenExpirationTimer(): void {
